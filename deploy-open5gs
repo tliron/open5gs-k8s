@@ -1,0 +1,44 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+
+VERSION=2.3.0
+
+kubectl delete deployments --selector app.kubernetes.io/part-of=open5gs --wait=true
+kubectl delete services --selector app.kubernetes.io/part-of=open5gs --wait=true
+
+if [ "$1" == -b ]; then
+    "$HERE/build-container-image"
+    "$HERE/push-container-image"
+fi
+
+sleep 10
+
+function d() {
+    VERSION=$VERSION \
+    COMPONENT=$1 \
+    REGISTRY=$(reposure registry info default host) \
+    envsubst < "$HERE/assets/kubernetes/component.yaml" |
+    kubectl apply -f -
+}
+
+d amf
+d ausf
+d bsf
+d hss
+d mme
+d nrf
+d nssf
+d pcf
+d pcrf
+d sgwc
+d sgwu
+d smf
+d udm
+d udr
+d upf
+
+VERSION=$VERSION \
+envsubst < "$HERE/assets/kubernetes/services.yaml" |
+kubectl apply -f -

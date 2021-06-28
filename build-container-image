@@ -1,0 +1,38 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+
+#BASE_IMAGE=registry.access.redhat.com/ubi8/ubi
+BASE_IMAGE=fedora:34
+CONTAINER_ID=$(buildah from "$BASE_IMAGE")
+
+function r () {
+	buildah run "$CONTAINER_ID" -- "$@"
+}
+
+DIST=$HERE/work/dist
+
+buildah add "$CONTAINER_ID" "$HERE/entrypoint" /bin/open5gs
+buildah add "$CONTAINER_ID" "$DIST/bin/"* /bin/
+buildah add "$CONTAINER_ID" "$DIST/etc/open5gs/"* /etc/open5gs/
+buildah add "$CONTAINER_ID" "$DIST/etc/freeDiameter/"* /etc/freeDiameter/
+buildah add "$CONTAINER_ID" "$DIST/lib64/"* /lib64/
+buildah add "$CONTAINER_ID" "$DIST/lib64/freeDiameter"* /lib64/freeDiameter/
+r mkdir --parents /var/log/open5gs
+
+buildah config \
+	--entrypoint /bin/open5gs \
+	"$CONTAINER_ID"
+
+# install iputils for "ping"
+
+r dnf install --assumeyes \
+	iputils \
+	mongo-c-driver \
+	libidn \
+	libmicrohttpd \
+	lksctp-tools
+r dnf --assumeyes clean all
+
+buildah commit "$CONTAINER_ID" localhost/open5gs

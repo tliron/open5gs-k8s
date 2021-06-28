@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+
+COMPONENT=$1
+
+POD=$(kubectl get pods --selector="app.kubernetes.io/name=$COMPONENT" --output=jsonpath="{.items[0].metadata.name}")
+
+kubectl logs $POD "${@:2}"

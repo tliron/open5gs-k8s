@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+
+BASE=$HERE/work/mongodb-kubernetes-operator
+
+if [ ! -d "$BASE" ]; then
+    git clone https://github.com/mongodb/mongodb-kubernetes-operator.git "$BASE"
+fi
+
+kubectl apply -f "$BASE/config/crd/bases/mongodbcommunity.mongodb.com_mongodbcommunity.yaml"
+kubectl apply -k "$BASE/config/rbac/"
+kubectl apply -f "$BASE/config/manager/manager.yaml"
+
+kubectl apply -f "$HERE/assets/kubernetes/mongodb.yaml"

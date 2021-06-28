@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+
+HOST=$(reposure registry info default host)
+podman tag localhost/open5gs $HOST/open5gs
+rm --force "$HERE/work/openg5s.tar"
+podman save $HOST/open5gs --output "$HERE/work/openg5s.tar"
+reposure image push default open5gs "$HERE/work/openg5s.tar"

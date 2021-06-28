@@ -1,0 +1,36 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+
+sudo dnf install --assumeyes \
+    git \
+    meson \
+    ninja-build \
+    gcc-c++ \
+    flex \
+    bison \
+    libyaml-devel \
+    mongo-c-driver-devel \
+    libgcrypt-devel \
+    libidn-devel \
+    gnutls-devel \
+    libnghttp2-devel \
+    libmicrohttpd-devel \
+    libcurl-devel \
+    lksctp-tools-devel
+
+mkdir --parents "$HERE/work"
+cd "$HERE/work"
+if [ ! -d source ]; then
+    git clone https://github.com/open5gs/open5gs source \
+        --branch v2.3.0 \
+        --recursive \
+        --depth 1
+fi
+
+cd source
+meson build --prefix="$HERE/work/dist"
+
+cd build
+ninja install

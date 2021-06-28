@@ -1,0 +1,44 @@
+---
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+
+metadata:
+  name: open5gs-mongodb
+  labels:
+    app.kubernetes.io/name: open5gs-mongodb
+    app.kubernetes.io/instance: open5gs-mongodb
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  members: 3
+  type: ReplicaSet
+  version: "4.4.5"
+  security:
+    authentication:
+      modes: ["SCRAM"]
+  users:
+  - name: user
+    db: admin
+    passwordSecretRef:
+      name: admin-password
+    roles:
+    - name: clusterAdmin
+      db: admin
+    - name: userAdminAnyDatabase
+      db: admin
+    scramCredentialsSecretName: scram
+  additionalMongodConfig:
+    storage.wiredTiger.engineConfig.journalCompressor: zlib
+
+---
+apiVersion: v1
+kind: Secret
+
+metadata:
+  name: admin-password
+
+type: Opaque
+stringData:
+  password: password

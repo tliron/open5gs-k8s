@@ -1,0 +1,42 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+
+#MONGODB_URI=$(kubectl get mongodbcommunity open5gs-mongodb --output=jsonpath={.status.mongoUri})
+
+# Fix relative directories
+sed --in-place \
+    "s|$HERE/work/dist||g" \
+    "$HERE/work/dist/etc/open5gs/"*.yaml
+sed --in-place \
+    "s|$HERE/work/dist||g" \
+    "$HERE/work/dist/etc/freeDiameter/"*.conf
+
+# MongoDB URI
+sed --in-place \
+    's|^db_uri: .*|db_uri: mongodb://open5gs-mongodb-0.open5gs-mongodb-svc:27017,open5gs-mongodb-1.open5gs-mongodb-svc:27017,open5gs-mongodb-2.open5gs-mongodb-svc:27017/open5gs|' \
+    "$HERE/work/dist/etc/open5gs/"*.yaml
+
+# Listen on all addresses
+sed --in-place \
+    '/^#/!s|127.0.0.*|0.0.0.0|' \
+    "$HERE/work/dist/etc/open5gs/"*.yaml
+
+# Diameter
+sed --in-place \
+    's|^ListenOn = |#ListenOn =|' \
+    "$HERE/work/dist/etc/freeDiameter/"*.conf
+
+sed --in-place \
+    's|ConnectTo = "127.0.0.2"|ConnectTo = "mme"|' \
+    "$HERE/work/dist/etc/freeDiameter/"*.conf
+sed --in-place \
+    's|ConnectTo = "127.0.0.4"|ConnectTo = "smf"|' \
+    "$HERE/work/dist/etc/freeDiameter/"*.conf
+sed --in-place \
+    's|ConnectTo = "127.0.0.8"|ConnectTo = "hss"|' \
+    "$HERE/work/dist/etc/freeDiameter/"*.conf
+sed --in-place \
+    's|ConnectTo = "127.0.0.9"|ConnectTo = "pcrf"|' \
+    "$HERE/work/dist/etc/freeDiameter/"*.conf

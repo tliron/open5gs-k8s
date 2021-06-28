@@ -1,0 +1,446 @@
+# See: https://open5gs.org/open5gs/docs/guide/01-quickstart/
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: mme
+  labels:
+    app.kubernetes.io/name: mme
+    app.kubernetes.io/instance: mme
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: mme
+    app.kubernetes.io/instance: mme
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+  ports:
+  - name: slap # S1-MME
+    protocol: TCP
+    targetPort: 36412
+    port: 36412
+  - name: gtpc # S11
+    protocol: TCP
+    targetPort: 2123
+    port: 2123
+  - name: frdi # S6a
+    protocol: TCP
+    targetPort: 3868
+    port: 3868
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: sgwc
+  labels:
+    app.kubernetes.io/name: sgwc
+    app.kubernetes.io/instance: sgwc
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: sgwc
+    app.kubernetes.io/instance: sgwc
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+  ports:
+  - name: gtpc # S11
+    protocol: TCP
+    targetPort: 2123
+    port: 2123
+  - name: pfcp # Sxa
+    protocol: TCP
+    targetPort: 8805
+    port: 8805
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: smf
+  labels:
+    app.kubernetes.io/name: smf
+    app.kubernetes.io/instance: smf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: smf
+    app.kubernetes.io/instance: smf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+  ports:
+  - name: gtpc # S5c, N11
+    protocol: TCP
+    targetPort: 2123
+    port: 2123
+  - name: gtpu # N4u (Sxu)
+    protocol: TCP
+    targetPort: 2152
+    port: 2152
+  - name: pfcp # N4 (Sxb)
+    protocol: TCP
+    targetPort: 8805
+    port: 8805
+  - name: frdi # Gx auth
+    protocol: TCP
+    targetPort: 3868
+    port: 3868
+  - name: sbi # 5G SBI (N7,N10,N11)
+    protocol: TCP
+    targetPort: 7777
+    port: 7777
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: amf
+  labels:
+    app.kubernetes.io/name: amf
+    app.kubernetes.io/instance: amf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: amf
+    app.kubernetes.io/instance: amf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+  ports:
+  - name: ngap # N2
+    protocol: TCP
+    targetPort: 38412
+    port: 38412
+  - name: sbi # 5G SBI (N8,N12,N11)
+    protocol: TCP
+    targetPort: 7777
+    port: 7777
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: sgwu
+  labels:
+    app.kubernetes.io/name: sgwu
+    app.kubernetes.io/instance: sgwu
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: sgwu
+    app.kubernetes.io/instance: sgwu
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+  ports:
+  - name: pfcp # Sxa
+    protocol: TCP
+    targetPort: 8805
+    port: 8805
+  - name: gtpu # S1-U, S5u
+    protocol: TCP
+    targetPort: 2152
+    port: 2152
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: upf
+  labels:
+    app.kubernetes.io/name: upf
+    app.kubernetes.io/instance: upf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: upf
+    app.kubernetes.io/instance: upf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+  ports:
+  - name: pfcp # N4 (Sxb)
+    protocol: TCP
+    targetPort: 8805
+    port: 8805
+  - name: gtpu # S5u, N3, N4u (Sxu)
+    protocol: TCP
+    targetPort: 2152
+    port: 2152
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: hss
+  labels:
+    app.kubernetes.io/name: hss
+    app.kubernetes.io/instance: hss
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: hss
+    app.kubernetes.io/instance: hss
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+  ports:
+  - name: frdi # S6a, Cx
+    protocol: TCP
+    targetPort: 3868
+    port: 3868
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: pcrf
+  labels:
+    app.kubernetes.io/name: pcrf
+    app.kubernetes.io/instance: pcrf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: pcrf
+    app.kubernetes.io/instance: pcrf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+  ports:
+  - name: frdi # S6a, Cx
+    protocol: TCP
+    targetPort: 3868
+    port: 3868
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: nrf
+  labels:
+    app.kubernetes.io/name: nrf
+    app.kubernetes.io/instance: nrf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: nrf
+    app.kubernetes.io/instance: nrf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+  ports:
+  - name: sbi # 5G SBI
+    protocol: TCP
+    targetPort: 7777
+    port: 7777
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: ausf
+  labels:
+    app.kubernetes.io/name: ausf
+    app.kubernetes.io/instance: ausf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: ausf
+    app.kubernetes.io/instance: ausf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+  ports:
+  - name: sbi # 5G SBI
+    protocol: TCP
+    targetPort: 7777
+    port: 7777
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: udm
+  labels:
+    app.kubernetes.io/name: udm
+    app.kubernetes.io/instance: udm
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: udm
+    app.kubernetes.io/instance: udm
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+  ports:
+  - name: sbi # 5G SBI
+    protocol: TCP
+    targetPort: 7777
+    port: 7777
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: pcf
+  labels:
+    app.kubernetes.io/name: pcf
+    app.kubernetes.io/instance: pcf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: pcf
+    app.kubernetes.io/instance: pcf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+  ports:
+  - name: sbi # 5G SBI
+    protocol: TCP
+    targetPort: 7777
+    port: 7777
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: nssf
+  labels:
+    app.kubernetes.io/name: nssf
+    app.kubernetes.io/instance: nssf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: nssf
+    app.kubernetes.io/instance: nssf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+  ports:
+  - name: sbi # 5G SBI
+    protocol: TCP
+    targetPort: 7777
+    port: 7777
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: bsf
+  labels:
+    app.kubernetes.io/name: bsf
+    app.kubernetes.io/instance: bsf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: bsf
+    app.kubernetes.io/instance: bsf
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+  ports:
+  - name: sbi # 5G SBI
+    protocol: TCP
+    targetPort: 7777
+    port: 7777
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: udr
+  labels:
+    app.kubernetes.io/name: udr
+    app.kubernetes.io/instance: udr
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: udr
+    app.kubernetes.io/instance: udr
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+  ports:
+  - name: sbi # 5G SBI
+    protocol: TCP
+    targetPort: 7777
+    port: 7777

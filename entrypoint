@@ -1,0 +1,6 @@
+#!/bin/bash
+set -e
+
+/bin/open5gs-${COMPONENT}d \
+    -c /etc/open5gs/${COMPONENT}.yaml \
+    -l /var/log/open5gs/${COMPONENT}.log
