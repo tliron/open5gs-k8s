@@ -3,6 +3,8 @@ set -e
 
 HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
 
+reposure image delete default open5gs
+sleep 5
 HOST=$(reposure registry info default host)
 podman tag localhost/open5gs $HOST/open5gs
 rm --force "$HERE/work/openg5s.tar"

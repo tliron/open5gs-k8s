@@ -3,7 +3,8 @@ set -e
 
 HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
 
-#MONGODB_URI=$(kubectl get mongodbcommunity open5gs-mongodb --output=jsonpath={.status.mongoUri})
+MONGODB_URI=$(kubectl get mongodbcommunity open5gs-mongodb --output=jsonpath={.status.mongoUri})
+MONGODB_URI=mongodb://user:password@${MONGODB_URI:10}/open5gs?authSource=admin
 
 # Fix relative directories
 sed --in-place \
@@ -15,7 +16,12 @@ sed --in-place \
 
 # MongoDB URI
 sed --in-place \
-    's|^db_uri: .*|db_uri: mongodb://open5gs-mongodb-0.open5gs-mongodb-svc:27017,open5gs-mongodb-1.open5gs-mongodb-svc:27017,open5gs-mongodb-2.open5gs-mongodb-svc:27017/open5gs|' \
+    "s|^db_uri: .*|db_uri: $MONGODB_URI|" \
+    "$HERE/work/dist/etc/open5gs/"*.yaml
+
+# No IPv6
+sed --in-place \
+    '/^#/!s|- ::1|#- ::1|' \
     "$HERE/work/dist/etc/open5gs/"*.yaml
 
 # Listen on all addresses

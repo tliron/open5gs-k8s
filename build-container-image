@@ -25,10 +25,23 @@ buildah config \
 	--entrypoint /bin/open5gs \
 	"$CONTAINER_ID"
 
-# install iputils for "ping"
+# install "iputils" for "ping"
+# install "mongodb-org-shell" for "mongo"
+
+cat <<- EOT > "$HERE/work/mongodb.repo"
+	[Mongodb]
+	name=MongoDB Repository
+	baseurl=https://repo.mongodb.org/yum/redhat/8/mongodb-org/4.4/x86_64/
+	gpgcheck=1
+	enabled=1
+	gpgkey=https://www.mongodb.org/static/pgp/server-4.4.asc
+EOT
+
+buildah add "$CONTAINER_ID" "$HERE/work/mongodb.repo" /etc/yum.repos.d/
 
 r dnf install --assumeyes \
 	iputils \
+	mongodb-org-shell \
 	mongo-c-driver \
 	libidn \
 	libmicrohttpd \

@@ -5,15 +5,20 @@ HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
 
 VERSION=2.3.0
 
-kubectl delete deployments --selector app.kubernetes.io/part-of=open5gs --wait=true
-kubectl delete services --selector app.kubernetes.io/part-of=open5gs --wait=true
+kubectl delete deployments --selector=app.kubernetes.io/part-of=open5gs --ignore-not-found=true
+kubectl delete services --selector=app.kubernetes.io/part-of=open5gs --ignore-not-found=true
+kubectl wait pods --selector=app.kubernetes.io/part-of=open5gs --for=delete || true
+kubectl wait services --selector=app.kubernetes.io/part-of=open5gs --for=delete || true
 
 if [ "$1" == -b ]; then
+    #"$HERE/build-binaries-fedora"
     "$HERE/build-container-image"
-    "$HERE/push-container-image"
+    "$HERE/publish-container-image"
 fi
 
-sleep 10
+VERSION=$VERSION \
+envsubst < "$HERE/assets/kubernetes/services.yaml" |
+kubectl apply -f -
 
 function d() {
     VERSION=$VERSION \
@@ -38,7 +43,3 @@ d smf
 d udm
 d udr
 d upf
-
-VERSION=$VERSION \
-envsubst < "$HERE/assets/kubernetes/services.yaml" |
-kubectl apply -f -

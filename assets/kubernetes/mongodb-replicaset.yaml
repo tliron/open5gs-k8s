@@ -1,0 +1,75 @@
+---
+apiVersion: mongodbcommunity.mongodb.com/v1
+kind: MongoDBCommunity
+
+metadata:
+  name: open5gs-mongodb
+  labels:
+    app.kubernetes.io/name: open5gs-mongodb
+    app.kubernetes.io/instance: open5gs-mongodb
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: ReplicaSet
+  members: 3
+  version: 4.4.6
+  security:
+    authentication:
+      modes: ["SCRAM"]
+  users:
+  - name: user
+    db: admin
+    passwordSecretRef:
+      name: open5gs-mongodb-user-password
+    roles:
+    - name: clusterAdmin
+      db: admin
+    - name: userAdminAnyDatabase
+      db: admin
+    scramCredentialsSecretName: scram
+  additionalMongodConfig:
+    storage.wiredTiger.engineConfig.journalCompressor: zlib
+    storage.wiredTiger.engineConfig.cacheSizeGB: 0.25
+  # The defaults are 10GB persistent volume claims
+  statefulSet:
+    spec:
+      volumeClaimTemplates:
+      - metadata:
+          name: data-volume
+          labels:
+            app.kubernetes.io/name: open5gs-mongodb
+            app.kubernetes.io/instance: open5gs-mongodb-data
+            app.kubernetes.io/component: 5g
+            app.kubernetes.io/part-of: open5gs
+            app.kubernetes.io/managed-by: open5gs
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 1Gi
+      - metadata:
+          name: logs-volume
+          labels:
+            app.kubernetes.io/name: open5gs-mongodb
+            app.kubernetes.io/instance: open5gs-mongodb-logs
+            app.kubernetes.io/component: 5g
+            app.kubernetes.io/part-of: open5gs
+            app.kubernetes.io/managed-by: open5gs
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 500Mi
+
+---
+apiVersion: v1
+kind: Secret
+
+metadata:
+  name: open5gs-mongodb-user-password
+
+type: Opaque
+stringData:
+  password: password

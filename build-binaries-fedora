@@ -30,7 +30,8 @@ if [ ! -d source ]; then
 fi
 
 cd source
-meson build --prefix="$HERE/work/dist"
+meson build --reconfigure --prefix="$HERE/work/dist"
 
 cd build
+ninja clean
 ninja install

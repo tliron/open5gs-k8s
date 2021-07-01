@@ -1,0 +1,33 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+
+BASE=$HERE/work/mongodb-kubernetes-operator
+
+if [ ! -d "$BASE" ]; then
+    git clone https://github.com/mongodb/mongodb-kubernetes-operator.git "$BASE"
+fi
+
+kubectl delete --filename="$HERE/assets/kubernetes/mongodb-replicaset.yaml" --ignore-not-found=true || true
+kubectl wait statefulsets --selector=app=open5gs-mongodb-svc --for=delete || true
+kubectl wait pods --selector=app=open5gs-mongodb-svc --for=delete || true
+
+kubectl apply --filename="$BASE/config/crd/bases/mongodbcommunity.mongodb.com_mongodbcommunity.yaml"
+kubectl apply --kustomize="$BASE/config/rbac/"
+kubectl apply --filename="$BASE/config/manager/manager.yaml"
+
+# Wait for operator
+kubectl wait deployments/mongodb-kubernetes-operator --for=condition=Available
+POD=$(kubectl get pods --selector=name=mongodb-kubernetes-operator --output=jsonpath={.items[0].metadata.name})
+kubectl wait "pods/$POD" --for=condition=ContainersReady
+
+kubectl apply --filename="$HERE/assets/kubernetes/mongodb-replicaset.yaml"
+
+PHASE=
+while [ "$PHASE" != Running ]; do
+    PHASE=$(kubectl get mongodbcommunity open5gs-mongodb --output=jsonpath={.status.phase})
+    echo -n .
+    sleep 1
+done
+echo
