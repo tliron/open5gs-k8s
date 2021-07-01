@@ -36,9 +36,17 @@ spec:
         env:
         - name: COMPONENT
           value: $COMPONENT
+        volumeMounts:
+        - mountPath: /etc/tls
+          name: tls
         securityContext:
           capabilities:
             add:
             - "NET_RAW" # enables "ping"
-            - "NET_ADMIN" # enabled access to "/dev/net/tun" (not enough)
-          privileged: true # HACK to enable "/dev/net/tun"
+            - "NET_ADMIN" # enabled access to "/dev/net/tun" (TODO doesn't work)
+          privileged: true # HACK to access "/dev/net/tun"
+      volumes:
+      - name: tls
+        secret:
+          secretName: $COMPONENT
+          optional: true

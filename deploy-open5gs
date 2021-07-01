@@ -2,26 +2,32 @@
 set -e
 
 HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+. "$HERE/_env"
 
-VERSION=2.3.0
-
-kubectl delete deployments --selector=app.kubernetes.io/part-of=open5gs --ignore-not-found=true
-kubectl delete services --selector=app.kubernetes.io/part-of=open5gs --ignore-not-found=true
-kubectl wait pods --selector=app.kubernetes.io/part-of=open5gs --for=delete || true
-kubectl wait services --selector=app.kubernetes.io/part-of=open5gs --for=delete || true
+if [ "$1" == -c ] || [ "$1" == -b ]; then
+    m 'cleaning up...'
+    kubectl delete deployments --selector=app.kubernetes.io/part-of=open5gs --ignore-not-found=true
+    kubectl delete services --selector=app.kubernetes.io/part-of=open5gs --ignore-not-found=true
+    kubectl wait pods --selector=app.kubernetes.io/part-of=open5gs --for=delete || true
+    kubectl wait services --selector=app.kubernetes.io/part-of=open5gs --for=delete || true
+fi
 
 if [ "$1" == -b ]; then
-    #"$HERE/build-binaries-fedora"
+    #"$HERE/build-binaries"
     "$HERE/build-container-image"
     "$HERE/publish-container-image"
 fi
 
-VERSION=$VERSION \
+m 'deploying services...'
+
+VERSION=$OPEN5GS_VERSION \
 envsubst < "$HERE/assets/kubernetes/services.yaml" |
 kubectl apply -f -
 
+m 'deploying components...'
+
 function d() {
-    VERSION=$VERSION \
+    VERSION=$OPEN5GS_VERSION \
     COMPONENT=$1 \
     REGISTRY=$(reposure registry info default host) \
     envsubst < "$HERE/assets/kubernetes/component.yaml" |

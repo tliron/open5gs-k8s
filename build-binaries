@@ -2,7 +2,9 @@
 set -e
 
 HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+. "$HERE/_env"
 
+m 'installing build requirements...'
 sudo dnf install --assumeyes \
     git \
     meson \
@@ -23,14 +25,17 @@ sudo dnf install --assumeyes \
 mkdir --parents "$HERE/work"
 cd "$HERE/work"
 if [ ! -d source ]; then
+    m 'cloning repository...'
     git clone https://github.com/open5gs/open5gs source \
         --branch v2.3.0 \
         --recursive \
         --depth 1
 fi
 
+m 'building...'
+
 cd source
-meson build --reconfigure --prefix="$HERE/work/dist"
+meson build --reconfigure --buildtype=debug --prefix="$HERE/work/dist"
 
 cd build
 ninja clean

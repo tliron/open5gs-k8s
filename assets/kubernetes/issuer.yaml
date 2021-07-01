@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+
+metadata:
+  name: selfsigned-issuer
+  labels:
+    app.kubernetes.io/name: selfsigned-issuer
+    app.kubernetes.io/instance: selfsigned-issuer
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  selfSigned: {}

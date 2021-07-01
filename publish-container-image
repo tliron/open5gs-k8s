@@ -2,11 +2,17 @@
 set -e
 
 HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+. "$HERE/_env"
 
+m 'deleting existing image...'
 reposure image delete default open5gs
 sleep 5
+
+m 'exporting image to tarball...'
 HOST=$(reposure registry info default host)
 podman tag localhost/open5gs $HOST/open5gs
 rm --force "$HERE/work/openg5s.tar"
 podman save $HOST/open5gs --output "$HERE/work/openg5s.tar"
+
+m 'publishing tarball...'
 reposure image push default open5gs "$HERE/work/openg5s.tar"

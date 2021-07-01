@@ -1,0 +1,43 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+. "$HERE/_env"
+
+m 'deploying Cert-Manager operator...'
+kubectl apply --filename="https://github.com/jetstack/cert-manager/releases/download/v$CERT_MANAGER_VERSION/cert-manager.yaml"
+POD=$(kubectl get pods --namespace=cert-manager --selector=app=webhook --output=jsonpath={.items[0].metadata.name})
+kubectl wait "pods/$POD" --namespace=cert-manager --for=condition=ContainersReady
+
+if [ "$1" == -c ]; then
+    m 'cleaning up...'
+    kubectl delete issuers --selector=app.kubernetes.io/part-of=open5gs --ignore-not-found=true
+    kubectl delete certificates --selector=app.kubernetes.io/part-of=open5gs --ignore-not-found=true
+    kubectl wait issuers --selector=app.kubernetes.io/part-of=open5gs --for=delete || true
+    kubectl wait certificates --selector=app.kubernetes.io/part-of=open5gs --for=delete || true
+    # Cert-Manager will never automatically delete secrets!
+    kubectl delete secrets hss --ignore-not-found=true
+    kubectl delete secrets mme --ignore-not-found=true
+    kubectl delete secrets pcrf --ignore-not-found=true
+    kubectl delete secrets smf --ignore-not-found=true
+fi
+
+m 'deploying issuer...'
+
+VERSION=$OPEN5GS_VERSION \
+envsubst < "$HERE/assets/kubernetes/issuer.yaml" |
+kubectl apply -f -
+
+m 'deploying certificates...'
+
+function d() {
+    VERSION=$OPEN5GS_VERSION \
+    COMPONENT=$1 \
+    envsubst < "$HERE/assets/kubernetes/certificate.yaml" |
+    kubectl apply -f -
+}
+
+d hss
+d mme
+d pcrf
+d smf

@@ -1,0 +1,24 @@
+apiVersion: cert-manager.io/v1
+kind: certificate
+
+metadata:
+  name: $COMPONENT
+  labels:
+    app.kubernetes.io/name: $COMPONENT
+    app.kubernetes.io/instance: $COMPONENT
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  secretName: $COMPONENT
+  issuerRef:
+    name: selfsigned-issuer
+  dnsNames:
+  - $COMPONENT.localdomain
+  duration: 87600h # 3650d
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048

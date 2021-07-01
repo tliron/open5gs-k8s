@@ -2,9 +2,8 @@
 set -e
 
 HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+. "$HERE/_env"
 
-#BASE_IMAGE=registry.access.redhat.com/ubi8/ubi
-BASE_IMAGE=fedora:34
 CONTAINER_ID=$(buildah from "$BASE_IMAGE")
 
 function r () {
@@ -12,11 +11,12 @@ function r () {
 }
 
 DIST=$HERE/work/dist
+ETC=$HERE/assets/etc
 
 buildah add "$CONTAINER_ID" "$HERE/entrypoint" /bin/open5gs
 buildah add "$CONTAINER_ID" "$DIST/bin/"* /bin/
-buildah add "$CONTAINER_ID" "$DIST/etc/open5gs/"* /etc/open5gs/
-buildah add "$CONTAINER_ID" "$DIST/etc/freeDiameter/"* /etc/freeDiameter/
+buildah add "$CONTAINER_ID" "$ETC/open5gs/"* /etc/open5gs/
+buildah add "$CONTAINER_ID" "$ETC/freeDiameter/"* /etc/freeDiameter/
 buildah add "$CONTAINER_ID" "$DIST/lib64/"* /lib64/
 buildah add "$CONTAINER_ID" "$DIST/lib64/freeDiameter"* /lib64/freeDiameter/
 r mkdir --parents /var/log/open5gs

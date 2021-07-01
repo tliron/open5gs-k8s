@@ -1,0 +1,69 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+. "$HERE/_env"
+
+ETC=$HERE/assets/etc
+
+rsync --recursive --exclude='*.pem' $HERE/work/dist/etc/* "$ETC/"
+
+MONGODB_URI=$(kubectl get mongodbcommunity open5gs-mongodb --output=jsonpath={.status.mongoUri})
+MONGODB_URI=mongodb://user:password@${MONGODB_URI:10}/open5gs?authSource=admin
+
+# Fix relative directories
+sed --in-place \
+    "s|$HERE/work/dist||g" \
+    "$ETC/open5gs/"*.yaml
+sed --in-place \
+    "s|$HERE/work/dist||g" \
+    "$ETC/freeDiameter/"*.conf
+
+# MongoDB URI
+sed --in-place \
+    "s|^db_uri: .*|db_uri: $MONGODB_URI|" \
+    "$ETC/open5gs/"*.yaml
+
+# Disable IPv6
+#sed --in-place \
+#    '/^#/!s|- ::1|#- ::1|' \
+#    "$ETC/open5gs/"*.yaml
+
+# Listen on all addresses
+sed --in-place \
+    '/^#/!s|127\.\0\.\0\..*|0.0.0.0|' \
+    "$ETC/open5gs/"*.yaml
+sed --in-place \
+    's|^ListenOn = |#ListenOn =|' \
+    "$ETC/freeDiameter/"*.conf
+
+# Addresses to domain names
+sed --in-place \
+    's|ConnectTo = "127\.\0\.\0\.2"|ConnectTo = "mme"|' \
+    "$ETC/freeDiameter/"*.conf
+sed --in-place \
+    's|ConnectTo = "127\.\0\.\0\.4"|ConnectTo = "smf"|' \
+    "$ETC/freeDiameter/"*.conf
+sed --in-place \
+    's|ConnectTo = "127\.\0\.\0\.8"|ConnectTo = "hss"|' \
+    "$ETC/freeDiameter/"*.conf
+sed --in-place \
+    's|ConnectTo = "127\.\0\.\0\.9"|ConnectTo = "pcrf"|' \
+    "$ETC/freeDiameter/"*.conf
+
+# Certificates
+sed --in-place \
+    's|^TLS_Cred =.*|TLS_Cred = "/etc/tls/tls.crt", "/etc/tls/tls.key";|' \
+    "$ETC/freeDiameter/"*.conf
+sed --in-place \
+    's|^TLS_CA =.*|TLS_CA = "/etc/tls/ca.crt";|' \
+    "$ETC/freeDiameter/"*.conf
+
+# Disable SCTP
+# (in many Linuxes SCTP is disabled by default)
+sed --in-place \
+    's|#No_SCTP;|No_SCTP;|' \
+    "$ETC/freeDiameter/"*.conf
+sed --in-place \
+    's|#Prefer_TCP;|Prefer_TCP;|' \
+    "$ETC/freeDiameter/"*.conf
