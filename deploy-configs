@@ -1,0 +1,50 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+. "$HERE/_env"
+
+if [ "$1" == -c ]; then
+    m 'cleaning up...'
+    kubectl delete configmaps --selector=app.kubernetes.io/part-of=open5gs --ignore-not-found=true
+    kubectl wait configmaps --selector=app.kubernetes.io/part-of=open5gs --for=delete || true
+
+fi
+
+m 'deploying configs...'
+
+function d() {
+    local YAML=$HERE/work/etc/open5gs/$1.yaml
+    local CONF=$HERE/work/etc/freeDiameter/$1.conf
+    if [ -f "$CONF" ]; then
+        kubectl create configmap "$1" \
+            --from-file="$YAML" \
+            --from-file="$CONF"
+    else
+        kubectl create configmap "$1" \
+            --from-file="$YAML"
+    fi
+    kubectl label configmap "$1" \
+        app.kubernetes.io/name=$COMPONENT \
+        app.kubernetes.io/instance=$COMPONENT \
+        app.kubernetes.io/version=$VERSION \
+        app.kubernetes.io/component=5g \
+        app.kubernetes.io/part-of=open5gs \
+        app.kubernetes.io/managed-by=open5gs
+}
+
+d amf
+d ausf
+d bsf
+d hss
+d mme
+d nrf
+d nssf
+d pcf
+d pcrf
+d sgwc
+d sgwu
+d smf
+d udm
+d udr
+d upf

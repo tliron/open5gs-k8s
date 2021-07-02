@@ -4,39 +4,29 @@ set -e
 HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
 . "$HERE/_env"
 
-m 'installing build requirements...'
-sudo dnf install --assumeyes \
-    git \
-    meson \
-    ninja-build \
-    gcc-c++ \
-    flex \
-    bison \
-    libyaml-devel \
-    mongo-c-driver-devel \
-    libgcrypt-devel \
-    libidn-devel \
-    gnutls-devel \
-    libnghttp2-devel \
-    libmicrohttpd-devel \
-    libcurl-devel \
-    lksctp-tools-devel
-
 mkdir --parents "$HERE/work"
-cd "$HERE/work"
+
+if [ "$1" == -c ]; then
+    m 'cleaning up...'
+    rm --recursive --force "$HERE/work/source"
+fi
+
 if [ ! -d source ]; then
     m 'cloning repository...'
-    git clone https://github.com/open5gs/open5gs source \
-        --branch v2.3.0 \
+    git clone https://github.com/open5gs/open5gs "$HERE/work/source" \
+        --branch "v$OPEN5GS_VERSION" \
         --recursive \
         --depth 1
 fi
 
+m 'configuring build...'
+cd "$HERE/work/source"
+meson build --buildtype=debug --prefix="$HERE/work/dist"
+
+m 'patching repository...'
+rsync -v --recursive "$HERE/assets/patches/"* "$HERE/work/source/"
+
 m 'building...'
-
-cd source
-meson build --reconfigure --buildtype=debug --prefix="$HERE/work/dist"
-
 cd build
 ninja clean
 ninja install

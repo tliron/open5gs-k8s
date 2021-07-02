@@ -8,7 +8,7 @@ BASE=$HERE/work/mongodb-kubernetes-operator
 
 if [ ! -d "$BASE" ]; then
     m 'cloning repository...'
-    git clone https://github.com/mongodb/mongodb-kubernetes-operator.git "$BASE"
+    git clone https://github.com/mongodb/mongodb-kubernetes-operator.git "$BASE" --depth 1
 fi
 
 m 'deploying MongoDB operator...'
@@ -30,7 +30,10 @@ fi
 
 m 'deploying... (may take some time!)'
 
-kubectl apply --filename="$HERE/assets/kubernetes/mongodb.yaml"
+VERSION=$OPEN5GS_VERSION \
+MONGODB_VERSION=$MONGODB_VERSION \
+envsubst < "$HERE/assets/kubernetes/mongodb.yaml" |
+kubectl apply -f -
 
 PHASE=
 while [ "$PHASE" != Running ]; do

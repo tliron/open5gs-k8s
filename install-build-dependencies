@@ -1,0 +1,27 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+. "$HERE/_env"
+
+# Note: freeDiameter absolutely requires kernel-mode SCTP (lksctp) but
+# it is possible for open5gs to use user-mode SCTP (usrsctp) instead 
+
+m 'installing build dependencies...'
+sudo dnf install --assumeyes \
+    git \
+    meson \
+    ninja-build \
+    gcc-c++ \
+    flex \
+    bison \
+    libyaml-devel \
+    mongo-c-driver-devel \
+    libgcrypt-devel \
+    libidn-devel \
+    gnutls-devel \
+    libnghttp2-devel \
+    libmicrohttpd-devel \
+    libcurl-devel \
+    lksctp-tools-devel \
+    usrsctp-devel

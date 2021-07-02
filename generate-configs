@@ -4,9 +4,9 @@ set -e
 HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
 . "$HERE/_env"
 
-ETC=$HERE/assets/etc
+ETC=$HERE/work/etc
 
-rsync --recursive --exclude='*.pem' $HERE/work/dist/etc/* "$ETC/"
+rsync -v --recursive --exclude='*.pem' $HERE/work/dist/etc/* "$ETC/"
 
 MONGODB_URI=$(kubectl get mongodbcommunity open5gs-mongodb --output=jsonpath={.status.mongoUri})
 MONGODB_URI=mongodb://user:password@${MONGODB_URI:10}/open5gs?authSource=admin

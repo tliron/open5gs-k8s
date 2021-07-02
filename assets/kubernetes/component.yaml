@@ -37,15 +37,25 @@ spec:
         - name: COMPONENT
           value: $COMPONENT
         volumeMounts:
+        - mountPath: /etc/open5gs/$COMPONENT.yaml
+          name: config
+          subPath: $COMPONENT.yaml
+        - mountPath: /etc/freeDiameter/$COMPONENT.conf
+          name: config
+          subPath: $COMPONENT.conf
+          # Note: if the subPath is not found in the volume an directory of this name will be created
         - mountPath: /etc/tls
           name: tls
         securityContext:
           capabilities:
             add:
             - "NET_RAW" # enables "ping"
-            - "NET_ADMIN" # enabled access to "/dev/net/tun" (TODO doesn't work)
+            - "NET_ADMIN" # enables access to "/dev/net/tun" (TODO doesn't work)
           privileged: true # HACK to access "/dev/net/tun"
       volumes:
+      - name: config
+        configMap:
+          name: $COMPONENT
       - name: tls
         secret:
           secretName: $COMPONENT

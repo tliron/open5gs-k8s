@@ -11,8 +11,8 @@ sleep 5
 m 'exporting image to tarball...'
 HOST=$(reposure registry info default host)
 podman tag localhost/open5gs $HOST/open5gs
-rm --force "$HERE/work/openg5s.tar"
-podman save $HOST/open5gs --output "$HERE/work/openg5s.tar"
+rm --force "$HERE/work/open5gs.tar"
+podman save $HOST/open5gs --output "$HERE/work/open5gs.tar"
 
 m 'publishing tarball...'
-reposure image push default open5gs "$HERE/work/openg5s.tar"
+reposure image push default open5gs "$HERE/work/open5gs.tar"
