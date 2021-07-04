@@ -1,0 +1,51 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+metadata:
+
+  template_name: Open5GS AMF Component
+
+imports:
+
+- file: ../profiles/open5gs/profile.yaml
+  namespace_prefix: 5g
+- file: ../profiles/open5gs-kubernetes/profile.yaml
+  namespace_prefix: k8s
+
+topology_template:
+
+  inputs:
+
+    component:
+      type: string
+      default: amf
+    version:
+      type: string
+      default: 2.3.0
+    registry:
+      type: string
+      default: docker.io
+    namespace:
+      type: string
+      default: workspace
+
+  node_templates:
+
+    component:
+      type: k8s:Component
+      capabilities:
+        service:
+          properties:
+            type: ClusterIP
+            ports:
+            - name: ngap # N2
+              protocol: TCP
+              targetPort: 38412
+              port: 38412
+            - name: sbi # 5G SBI (N8,N12,N11)
+              protocol: TCP
+              targetPort: 7777
+              port: 7777
+
+  substitution_mappings:
+
+    node_type: 5g:AMF

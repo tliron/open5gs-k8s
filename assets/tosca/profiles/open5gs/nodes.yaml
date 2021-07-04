@@ -1,0 +1,121 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+imports:
+
+- capabilities.yaml
+- relationships.yaml
+
+node_types:
+
+  Store:
+    capabilities:
+      storage: Store
+
+  Component: {}
+
+  DiameterComponent:
+    derived_from: Component
+    capabilities:
+      diameter: Diameter
+    requirements:
+    - diameter-peer:
+        relationship: DiameterPeer
+        capability: Diameter
+        occurrences: [ 0, UNBOUNDED ]
+
+  AMF:
+    derived_from: Component
+    capabilities:
+      amf: AMF
+      nrf: NRF
+
+  AUSF:
+    derived_from: Component
+    capabilities:
+      ausf: AUSF
+      nrf: NRF
+
+  BSF:
+    derived_from: Component
+    capabilities:
+      bsf: BSF
+      nrf: NRF
+    requirements:
+    - storage: Store
+
+  HSS:
+    derived_from: DiameterComponent
+    requirements:
+    - storage: Store
+
+  MME:
+    derived_from: DiameterComponent
+    capabilities:
+      mme: MME
+      sgwc: SGWC
+      smf: SMF
+
+  NRF:
+    derived_from: Component
+    capabilities:
+      nrf: NRF
+    requirements:
+    - storage: Store
+
+  NSSF:
+    derived_from: Component
+    capabilities:
+      nssf: NSSF
+      nrf: NRF
+
+  PCF:
+    derived_from: Component
+    capabilities:
+      pcf: PCF
+      nrf: NRF
+    requirements:
+    - storage: Store
+
+  PCRF:
+    derived_from: DiameterComponent
+    requirements:
+    - storage: Store
+
+  SGWC:
+    derived_from: Component
+    capabilities:
+      sgwc: SGWC
+      sgwu: SGWU
+
+  SGWU:
+    derived_from: Component
+    capabilities:
+      sgwu: SGWU
+      sgwc: SGWC
+
+  SMF:
+    derived_from: DiameterComponent
+    capabilities:
+      smf: SMF
+      nrf: NRF
+      upf: UPF
+
+  UDM:
+    derived_from: Component
+    capabilities:
+      udm: UDM
+      nrf: NRF
+
+  UDR:
+    derived_from: Component
+    capabilities:
+      udr: UDR
+      nrf: NRF
+    requirements:
+    - storage: Store
+
+  UPF:
+    derived_from: Component
+    capabilities:
+      upf: UPF
+      smf: SMF

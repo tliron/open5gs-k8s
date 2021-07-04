@@ -1,0 +1,219 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+imports:
+
+- data.yaml
+
+capability_types:
+
+  Store: {}
+
+  AMF:
+    properties:
+      guami:
+        type: list
+        entry_schema: GUAMI
+      tai:
+        type: list
+        entry_schema: TAI
+      plmn_support:
+        type: list
+        entry_schema: PLMN_Support
+      security:
+        type: Security
+      network_name:
+        type: NetworkName
+      amf_name:
+        type: string
+    attributes:
+      sbi:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+          port: 7777
+      ngap:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+
+  AUSF:
+    attributes:
+      sbi:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+          port: 7777
+
+  BSF:
+    attributes:
+      sbi:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+          port: 7777
+
+  MME:
+    properties:
+      gummei:
+        type: GUMMEI
+      tai:
+        type: TAI
+      security:
+        type: Security
+      network_name:
+        type: NetworkName
+      mme_name:
+        type: string
+    attributes:
+      s1ap:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+      gtpc:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+
+  NRF:
+    attributes:
+      sbi:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+          port: 7777
+
+  NSSF:
+    attributes:
+      sbi:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+          port: 7777
+      nsi:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+          port: 7777
+          s_nssai:
+            sst: 1
+
+  PCF:
+    attributes:
+      sbi:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+          port: 7777
+
+  SGWC:
+    attributes:
+      gtpc:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+      pfcp:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+
+  SGWU:
+    attributes:
+      pfcp:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+      gtpu:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+
+  SMF:
+    properties:
+      subnet:
+        type: list
+        entry_schema: Subnet
+        required: false
+      dns:
+        type: list
+        entry_schema: IPAddress
+        required: false
+      mtu:
+        type: integer
+        required: false
+    attributes:
+      sbi:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+          port: 7777
+      pfcp:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+      gtpc:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+      gtpu:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+
+  UDM:
+    attributes:
+      sbi:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+          port: 7777
+
+  UDR:
+    attributes:
+      sbi:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+          port: 7777
+
+  UPF:
+    properties:
+      subnet:
+        type: list
+        entry_schema: Subnet
+        required: false
+    attributes:
+      pfcp:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+      gtpu:
+        type: list
+        entry_schema: Endpoint
+        default:
+        - addr: [ 0.0.0.0 ]
+
+  Diameter:
+    properties:
+      identity:
+        type: string # identity.realm

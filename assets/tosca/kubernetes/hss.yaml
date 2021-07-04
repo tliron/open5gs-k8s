@@ -1,0 +1,47 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+metadata:
+
+  template_name: Open5GS HSS Component
+
+imports:
+
+- file: ../profiles/open5gs/profile.yaml
+  namespace_prefix: 5g
+- file: ../profiles/open5gs-kubernetes/profile.yaml
+  namespace_prefix: k8s
+
+topology_template:
+
+  inputs:
+
+    component:
+      type: string
+      default: hss
+    version:
+      type: string
+      default: 2.3.0
+    registry:
+      type: string
+      default: docker.io
+    namespace:
+      type: string
+      default: workspace
+
+  node_templates:
+
+    component:
+      type: k8s:Component
+      capabilities:
+        service:
+          properties:
+            type: ClusterIP
+            ports:
+            - name: frdi # S6a, Cx
+              protocol: TCP
+              targetPort: 3868
+              port: 3868
+
+  substitution_mappings:
+
+    node_type: 5g:HSS

@@ -1,0 +1,18 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+metadata:
+
+  template_name: MongoDB Replicaset
+
+imports:
+
+- file: ../profiles/open5gs/profile.yaml
+  namespace_prefix: 5g
+- file: https://raw.githubusercontent.com/tliron/turandot/main/assets/tosca/profiles/kubernetes/1.0/profile.yaml
+  namespace_prefix: k8s
+
+topology_template:
+
+  substitution_mappings:
+
+    node_type: 5g:Store

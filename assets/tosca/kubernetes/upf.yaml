@@ -1,0 +1,51 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+metadata:
+
+  template_name: Open5GS UPF Component
+
+imports:
+
+- file: ../profiles/open5gs/profile.yaml
+  namespace_prefix: 5g
+- file: ../profiles/open5gs-kubernetes/profile.yaml
+  namespace_prefix: k8s
+
+topology_template:
+
+  inputs:
+
+    component:
+      type: string
+      default: upf
+    version:
+      type: string
+      default: 2.3.0
+    registry:
+      type: string
+      default: docker.io
+    namespace:
+      type: string
+      default: workspace
+
+  node_templates:
+
+    component:
+      type: k8s:Component
+      capabilities:
+        service:
+          properties:
+            type: ClusterIP
+            ports:
+            - name: pfcp # N4 (Sxb)
+              protocol: TCP
+              targetPort: 8805
+              port: 8805
+            - name: gtpu # S5u, N3, N4u (Sxu)
+              protocol: TCP
+              targetPort: 2152
+              port: 2152
+
+  substitution_mappings:
+
+    node_type: 5g:UPF

@@ -1,0 +1,56 @@
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+imports:
+
+#- file: https://raw.githubusercontent.com/tliron/turandot/main/assets/tosca/profiles/kubernetes/1.0/profile.yaml
+- file: ../../../../../turandot/assets/tosca/profiles/kubernetes/1.0/profile.yaml
+  namespace_prefix: k8s
+
+capability_types:
+
+  Metadata:
+    derived_from: k8s:Metadata
+    properties:
+      name:
+        default: { get_input: component }
+      namespace:
+        default: { get_input: namespace }
+      labels:
+        default:
+          app.kubernetes.io/name: { get_input: component }
+          app.kubernetes.io/instance: { get_input: component }
+          app.kubernetes.io/version: { get_input: version }
+          app.kubernetes.io/component: 5g
+          app.kubernetes.io/part-of: open5gs
+          app.kubernetes.io/managed-by: open5gs
+
+  Deployment:
+    derived_from: k8s:Deployment
+    properties:
+      metadataNamePostfix:
+        default: ''
+      template:
+        default:
+          containers:
+          - name: main
+            image: { concat: [ { get_input: registry }, /, open5gs:latest ] }
+            imagePullPolicy: Always
+            env:
+            - name: COMPONENT
+              value: $COMPONENT
+            volumeMounts:
+            - mountPath: /etc/open5gs/$COMPONENT.yaml
+              name: config
+              subPath: $COMPONENT.yaml
+            - mountPath: /etc/freeDiameter/$COMPONENT.conf
+              name: config
+              subPath: $COMPONENT.conf
+              # Note: if the subPath is not found in the volume an directory of this name will be created
+            - mountPath: /etc/tls
+              name: tls
+            securityContext:
+              capabilities:
+                add:
+                - "NET_RAW" # enables "ping"
+                - "NET_ADMIN" # enables access to "/dev/net/tun" (TODO doesn't work)
+              privileged: true # HACK to access "/dev/net/tun"
