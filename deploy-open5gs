@@ -26,11 +26,17 @@ kubectl apply -f -
 
 m 'deploying components...'
 
-function d() {
+function d () {
+    if [ "$1" == webui ]; then
+        local TEMPLATE=$HERE/assets/kubernetes/webui.yaml
+    else
+        local TEMPLATE=$HERE/assets/kubernetes/component.yaml
+    fi
+
     VERSION=$OPEN5GS_VERSION \
     COMPONENT=$1 \
     REGISTRY=$(reposure registry info default host) \
-    envsubst < "$HERE/assets/kubernetes/component.yaml" |
+    envsubst < "$TEMPLATE" |
     kubectl apply -f -
 }
 
@@ -49,3 +55,4 @@ d smf
 d udm
 d udr
 d upf
+d webui

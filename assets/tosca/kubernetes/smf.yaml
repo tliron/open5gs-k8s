@@ -35,28 +35,28 @@ topology_template:
       capabilities:
         service:
           properties:
-            type: ClusterIP
-            ports:
-            - name: gtpc # S5c, N11
-              protocol: TCP
-              targetPort: 2123
-              port: 2123
-            - name: gtpu # N4u (Sxu)
-              protocol: TCP
-              targetPort: 2152
-              port: 2152
-            - name: pfcp # N4 (Sxb)
-              protocol: TCP
-              targetPort: 8805
-              port: 8805
-            - name: frdi # Gx auth
-              protocol: TCP
-              targetPort: 3868
-              port: 3868
-            - name: sbi # 5G SBI (N7,N10,N11)
-              protocol: TCP
-              targetPort: 7777
-              port: 7777
+            spec:
+              ports:
+              - name: gtpc # S5c, N11
+                protocol: TCP
+                targetPort: { port: 2123 }
+                port: 2123
+              - name: gtpu # N4u (Sxu)
+                protocol: TCP
+                targetPort: { port: 2152 }
+                port: 2152
+              - name: pfcp # N4 (Sxb)
+                protocol: TCP
+                targetPort: { port: 8805 }
+                port: 8805
+              - name: frdi # Gx auth
+                protocol: TCP
+                targetPort: { port: 3868 }
+                port: 3868
+              - name: sbi # 5G SBI (N7,N10,N11)
+                protocol: TCP
+                targetPort: { port: 7777 }
+                port: 7777
 
   substitution_mappings:
 

@@ -9,9 +9,10 @@ mkdir --parents "$HERE/work"
 if [ "$1" == -c ]; then
     m 'cleaning up...'
     rm --recursive --force "$HERE/work/source"
+    rm --recursive --force "$HERE/work/dist"
 fi
 
-if [ ! -d source ]; then
+if [ ! -d "$HERE/work/source" ]; then
     m 'cloning repository...'
     git clone https://github.com/open5gs/open5gs "$HERE/work/source" \
         --branch "v$OPEN5GS_VERSION" \
@@ -26,7 +27,15 @@ meson build --buildtype=debug --prefix="$HERE/work/dist"
 m 'patching repository...'
 rsync -v --recursive "$HERE/assets/patches/"* "$HERE/work/source/"
 
-m 'building...'
+m 'building binaries...'
 cd build
-ninja clean
 ninja install
+
+m 'building webui...'
+if [ ! -d "$HERE/work/dist/opt/open5gs-webui" ]; then
+    mkdir --parents "$HERE/work/dist/opt"
+    rsync -v --recursive "$HERE/work/source/webui/" "$HERE/work/dist/opt/open5gs-webui"
+fi
+cd "$HERE/work/dist/opt/open5gs-webui"
+npm install
+npm run build

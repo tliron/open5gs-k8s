@@ -3,6 +3,7 @@ tosca_definitions_version: tosca_simple_yaml_1_3
 imports:
 
 - capabilities.yaml
+#- file: git:https://github.com/tliron/turandot.git!assets/tosca/profiles/kubernetes/1.0/profile.yaml
 #- file: https://raw.githubusercontent.com/tliron/turandot/main/assets/tosca/profiles/kubernetes/1.0/profile.yaml
 - file: ../../../../../turandot/assets/tosca/profiles/kubernetes/1.0/profile.yaml
   namespace_prefix: k8s
@@ -14,4 +15,4 @@ node_types:
       metadata:
         type: Metadata
       deployment: Deployment
-      service: k8s:Service
+      service: k8s:ClusterIP

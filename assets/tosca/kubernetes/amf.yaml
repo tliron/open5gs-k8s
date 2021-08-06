@@ -35,16 +35,16 @@ topology_template:
       capabilities:
         service:
           properties:
-            type: ClusterIP
-            ports:
-            - name: ngap # N2
-              protocol: TCP
-              targetPort: 38412
-              port: 38412
-            - name: sbi # 5G SBI (N8,N12,N11)
-              protocol: TCP
-              targetPort: 7777
-              port: 7777
+            spec:
+              ports:
+              - name: ngap # N2
+                protocol: TCP
+                targetPort: { port: 38412 }
+                port: 38412
+              - name: sbi # 5G SBI (N8,N12,N11)
+                protocol: TCP
+                targetPort: { port: 7777 }
+                port: 7777
 
   substitution_mappings:
 

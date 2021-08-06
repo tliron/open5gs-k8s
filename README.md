@@ -20,8 +20,9 @@ machine for you. To use it, change into this repository's directory and run:
     cd /vagrant
 
 1. install-build-dependencies
-2. build-binaries
+2. build-distribution
 3. build-container-image
+4. publish-container-image
 
 ### Step 2: Deploy
 
@@ -32,10 +33,15 @@ You will need access to a Kubernetes cluster. For testing you can use
 2. deploy-certificates
 3. generate-configs
 4. deploy-configs
-5. publish-container-image
-6. deploy-open5gs
+5. deploy-open5gs
 
 ### Utilities
+
+To get the webui URL:
+
+    ./webui-url
+
+The default user is "admin" and the default password is "1423".
 
 You can see the logs of any component:
 
@@ -50,4 +56,4 @@ TODO
 ----
 
 * Restart components when configmaps are updated
-* Make use of [Reposure](https://reposure.puccini.cloud/) optional
+* Make the [Reposure](https://reposure.puccini.cloud/) requirement optional

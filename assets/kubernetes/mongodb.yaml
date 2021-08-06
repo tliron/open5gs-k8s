@@ -17,22 +17,20 @@ spec:
   version: $MONGODB_VERSION
   security:
     authentication:
-      modes: ["SCRAM"]
+      modes: [ SCRAM ]
   users:
   - name: user
     db: admin
     passwordSecretRef:
       name: open5gs-mongodb-user-password
     roles:
-    - name: clusterAdmin
-      db: admin
-    - name: userAdminAnyDatabase
+    - name: root
       db: admin
     scramCredentialsSecretName: scram
   additionalMongodConfig:
     storage.wiredTiger.engineConfig.journalCompressor: zlib
     storage.wiredTiger.engineConfig.cacheSizeGB: 0.25
-  # The defaults are 10GB persistent volume claims
+  # The defaults are 10GB persistent volume claims, we will reduce them here
   statefulSet:
     spec:
       volumeClaimTemplates:

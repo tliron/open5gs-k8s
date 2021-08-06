@@ -8,7 +8,12 @@ BASE=$HERE/work/mongodb-kubernetes-operator
 
 if [ ! -d "$BASE" ]; then
     m 'cloning repository...'
+    # git clone https://github.com/mongodb/mongodb-kubernetes-operator.git "$BASE" --branch "v$MONGODB_OPERATOR_VERSION" --depth 1
+    # The tag is v0.7.0 is broken, so we'll use master
     git clone https://github.com/mongodb/mongodb-kubernetes-operator.git "$BASE" --depth 1
+
+    # See: https://github.com/mongodb/mongodb-kubernetes-operator/issues/676
+    sed --in-place '332 s/^/#/' "$BASE/config/crd/bases/mongodbcommunity.mongodb.com_mongodbcommunity.yaml"
 fi
 
 m 'deploying MongoDB operator...'

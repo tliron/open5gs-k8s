@@ -12,14 +12,16 @@ function r () {
 
 DIST=$HERE/work/dist
 
-buildah add "$CONTAINER_ID" "$HERE/assets/scripts/entrypoint" /bin/open5gs
-buildah add "$CONTAINER_ID" "$DIST/bin/"* /bin/
-buildah add "$CONTAINER_ID" "$DIST/lib64/"* /lib64/
-buildah add "$CONTAINER_ID" "$DIST/lib64/freeDiameter"* /lib64/freeDiameter/
+buildah copy "$CONTAINER_ID" "$HERE/assets/scripts/entrypoint" /bin/open5gs
+buildah copy "$CONTAINER_ID" "$DIST/bin/"* /bin/
+# Components that need freeDiameter: smf, pcrf, hss, mme
+buildah_copy_recursive "$CONTAINER_ID" "$DIST/lib64" /lib64
+# For webui
+buildah_copy_recursive "$CONTAINER_ID" "$DIST/opt/open5gs-webui" /opt/open5gs-webui
 r mkdir --parents /var/log/open5gs
 
 cat <<- EOT > "$HERE/work/mongodb.repo"
-	[Mongodb]
+	[MongoDB]
 	name=MongoDB Repository
 	baseurl=https://repo.mongodb.org/yum/redhat/8/mongodb-org/$MONGODB_REPOSITORY_VERSION/x86_64/
 	gpgcheck=1
@@ -27,7 +29,7 @@ cat <<- EOT > "$HERE/work/mongodb.repo"
 	gpgkey=https://www.mongodb.org/static/pgp/server-$MONGODB_REPOSITORY_VERSION.asc
 EOT
 
-buildah add "$CONTAINER_ID" "$HERE/work/mongodb.repo" /etc/yum.repos.d/
+buildah copy "$CONTAINER_ID" "$HERE/work/mongodb.repo" /etc/yum.repos.d/
 
 # "iputils" for "ping"
 # "mongodb-org-shell" for "mongo"
@@ -39,7 +41,8 @@ r dnf install --assumeyes \
 	libidn \
 	libmicrohttpd \
 	lksctp-tools \
-	usrsctp
+	usrsctp \
+	npm
 r dnf --assumeyes clean all
 
 buildah config \

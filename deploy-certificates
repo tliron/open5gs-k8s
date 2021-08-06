@@ -30,7 +30,7 @@ kubectl apply -f -
 
 m 'deploying certificates...'
 
-function d() {
+function d () {
     VERSION=$OPEN5GS_VERSION \
     COMPONENT=$1 \
     envsubst < "$HERE/assets/kubernetes/certificate.yaml" |

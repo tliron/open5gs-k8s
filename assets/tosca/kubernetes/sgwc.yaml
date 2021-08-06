@@ -35,16 +35,16 @@ topology_template:
       capabilities:
         service:
           properties:
-            type: ClusterIP
-            ports:
-            - name: gtpc # S11
-              protocol: TCP
-              targetPort: 2123
-              port: 2123
-            - name: pfcp # Sxa
-              protocol: TCP
-              targetPort: 8805
-              port: 8805
+            spec:
+              ports:
+              - name: gtpc # S11
+                protocol: TCP
+                targetPort: { port: 2123 }
+                port: 2123
+              - name: pfcp # Sxa
+                protocol: TCP
+                targetPort: { port: 8805 }
+                port: 8805
 
   substitution_mappings:
 

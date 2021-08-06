@@ -35,12 +35,12 @@ topology_template:
       capabilities:
         service:
           properties:
-            type: ClusterIP
-            ports:
-            - name: sbi # 5G SBI
-              protocol: TCP
-              targetPort: 7777
-              port: 7777
+            spec:
+              ports:
+              - name: sbi # 5G SBI
+                protocol: TCP
+                targetPort: { port: 7777 }
+                port: 7777
 
   substitution_mappings:
 

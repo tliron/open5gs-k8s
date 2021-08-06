@@ -2,6 +2,7 @@ tosca_definitions_version: tosca_simple_yaml_1_3
 
 imports:
 
+#- file: git:https://github.com/tliron/turandot.git!assets/tosca/profiles/kubernetes/1.0/profile.yaml
 #- file: https://raw.githubusercontent.com/tliron/turandot/main/assets/tosca/profiles/kubernetes/1.0/profile.yaml
 - file: ../../../../../turandot/assets/tosca/profiles/kubernetes/1.0/profile.yaml
   namespace_prefix: k8s
@@ -27,30 +28,30 @@ capability_types:
   Deployment:
     derived_from: k8s:Deployment
     properties:
-      metadataNamePostfix:
-        default: ''
-      template:
+      spec:
         default:
-          containers:
-          - name: main
-            image: { concat: [ { get_input: registry }, /, open5gs:latest ] }
-            imagePullPolicy: Always
-            env:
-            - name: COMPONENT
-              value: $COMPONENT
-            volumeMounts:
-            - mountPath: /etc/open5gs/$COMPONENT.yaml
-              name: config
-              subPath: $COMPONENT.yaml
-            - mountPath: /etc/freeDiameter/$COMPONENT.conf
-              name: config
-              subPath: $COMPONENT.conf
-              # Note: if the subPath is not found in the volume an directory of this name will be created
-            - mountPath: /etc/tls
-              name: tls
-            securityContext:
-              capabilities:
-                add:
-                - "NET_RAW" # enables "ping"
-                - "NET_ADMIN" # enables access to "/dev/net/tun" (TODO doesn't work)
-              privileged: true # HACK to access "/dev/net/tun"
+          template:
+            spec:
+              containers:
+              - name: main
+                image: { concat: [ { get_input: registry }, /open5gs:latest ] }
+                imagePullPolicy: Always
+                env:
+                - name: COMPONENT
+                  value: { get_input: component }
+                volumeMounts:
+                - mountPath: { concat: [ /etc/open5gs/, { get_input: component }, .yaml ] }
+                  name: config
+                  subPath: { concat: [ { get_input: component }, .yaml ] }
+                - mountPath: { concat: [ /etc/freeDiameter/, { get_input: component }, .conf ] }
+                  name: config
+                  subPath: { concat: [ { get_input: component }, .conf ] }
+                  # Note: if the subPath is not found in the volume an directory of this name will be created
+                - mountPath: /etc/tls
+                  name: tls
+                securityContext:
+                  capabilities:
+                    add:
+                    - "NET_RAW" # enables "ping"
+                    - "NET_ADMIN" # enables access to "/dev/net/tun" (TODO doesn't work)
+                  privileged: true # HACK to access "/dev/net/tun"

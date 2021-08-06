@@ -457,3 +457,31 @@ spec:
     protocol: TCP
     targetPort: 7777
     port: 7777
+
+---
+
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: webui
+  labels:
+    app.kubernetes.io/name: webui
+    app.kubernetes.io/instance: webui
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  type: LoadBalancer
+  selector:
+    app.kubernetes.io/name: webui
+    app.kubernetes.io/instance: webui
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+  ports:
+  - name: http
+    protocol: TCP
+    targetPort: 3000
+    port: 80

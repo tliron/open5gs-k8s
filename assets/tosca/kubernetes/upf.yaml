@@ -35,16 +35,16 @@ topology_template:
       capabilities:
         service:
           properties:
-            type: ClusterIP
-            ports:
-            - name: pfcp # N4 (Sxb)
-              protocol: TCP
-              targetPort: 8805
-              port: 8805
-            - name: gtpu # S5u, N3, N4u (Sxu)
-              protocol: TCP
-              targetPort: 2152
-              port: 2152
+            spec:
+              ports:
+              - name: pfcp # N4 (Sxb)
+                protocol: TCP
+                targetPort: { port: 8805 }
+                port: 8805
+              - name: gtpu # S5u, N3, N4u (Sxu)
+                protocol: TCP
+                targetPort: { port: 2152 }
+                port: 2152
 
   substitution_mappings:
 

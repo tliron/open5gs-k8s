@@ -13,3 +13,19 @@ function m () {
 	local COLOR=${2:-$BLUE}
 	echo -e "$COLOR$1$RESET"
 }
+
+function escape_sed () {
+	# See: https://stackoverflow.com/a/2705678
+	printf '%s\n' "$1" | sed -e 's/[\/&]/\\&/g'
+}
+
+function buildah_copy_recursive () {
+	local CONTAINER_ID=$1
+	local SRC=$2
+	local DEST=$3
+
+	local ARCHIVE=$(mktemp buildah_copy_recursive-XXXXXX --suffix .tar)
+	tar cf "$ARCHIVE" --directory="$SRC" .
+	buildah add "$CONTAINER_ID" "$ARCHIVE" "$DEST/"
+	rm "$ARCHIVE"
+}

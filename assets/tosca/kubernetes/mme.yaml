@@ -35,20 +35,20 @@ topology_template:
       capabilities:
         service:
           properties:
-            type: ClusterIP
-            ports:
-            - name: slap # S1-MME
-              protocol: TCP
-              targetPort: 36412
-              port: 36412
-            - name: gtpc # S11
-              protocol: TCP
-              targetPort: 2123
-              port: 2123
-            - name: frdi # S6a
-              protocol: TCP
-              targetPort: 3868
-              port: 3868
+            spec:
+              ports:
+              - name: slap # S1-MME
+                protocol: TCP
+                targetPort: { port: 36412 }
+                port: 36412
+              - name: gtpc # S11
+                protocol: TCP
+                targetPort: { port: 2123 }
+                port: 2123
+              - name: frdi # S6a
+                protocol: TCP
+                targetPort: { port: 3868 }
+                port: 3868
 
   substitution_mappings:
 

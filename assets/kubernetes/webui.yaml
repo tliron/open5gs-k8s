@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: $COMPONENT
+  labels:
+    app.kubernetes.io/name: $COMPONENT
+    app.kubernetes.io/instance: $COMPONENT
+    app.kubernetes.io/version: $VERSION
+    app.kubernetes.io/component: 5g
+    app.kubernetes.io/part-of: open5gs
+    app.kubernetes.io/managed-by: open5gs
+
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: $COMPONENT
+      app.kubernetes.io/instance: $COMPONENT
+      app.kubernetes.io/version: $VERSION
+      app.kubernetes.io/component: 5g
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: $COMPONENT
+        app.kubernetes.io/instance: $COMPONENT
+        app.kubernetes.io/version: $VERSION
+        app.kubernetes.io/component: 5g
+        app.kubernetes.io/part-of: open5gs
+        app.kubernetes.io/managed-by: open5gs
+    spec:
+      containers:
+      - name: main
+        image: $REGISTRY/open5gs:latest
+        imagePullPolicy: Always
+        env:
+        - name: COMPONENT
+          value: $COMPONENT
+        - name: DB_URI
+          valueFrom:
+            configMapKeyRef:
+              name: $COMPONENT
+              key: db_uri

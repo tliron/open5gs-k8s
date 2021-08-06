@@ -35,12 +35,12 @@ topology_template:
       capabilities:
         service:
           properties:
-            type: ClusterIP
-            ports:
-            - name: frdi # S6a, Cx
-              protocol: TCP
-              targetPort: 3868
-              port: 3868
+            spec:
+              ports:
+              - name: frdi # S6a, Cx
+                protocol: TCP
+                targetPort: { port: 3868 }
+                port: 3868
 
   substitution_mappings:
 
