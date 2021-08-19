@@ -4,15 +4,17 @@ set -e
 HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
 . "$HERE/_env"
 
+TARBALL=$HERE/work/open5gs-container-image.tar
+
 m 'deleting existing image...'
-reposure image delete default open5gs
+reposure image delete default "$OPEN5GS_IMAGE_TAG"
 sleep 5
 
 m 'exporting image to tarball...'
 HOST=$(reposure registry info default host)
-podman tag localhost/open5gs $HOST/open5gs
-rm --force "$HERE/work/open5gs.tar"
-podman save $HOST/open5gs --output "$HERE/work/open5gs.tar"
+podman tag "localhost/$OPEN5GS_IMAGE_TAG" "$HOST/$OPEN5GS_IMAGE_TAG"
+rm --force "$TARBALL"
+podman save "$HOST/$OPEN5GS_IMAGE_TAG" --output "$TARBALL"
 
 m 'publishing tarball...'
-reposure image push default open5gs "$HERE/work/open5gs.tar"
+reposure image push default open5gs/open5gs "$TARBALL"

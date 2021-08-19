@@ -1,14 +1,58 @@
 #!/bin/bash
 set -e
 
-if [ "$COMPONENT" == webui ]; then
-    cd /opt/open5gs-webui
-    npm run dev
-    sleep infinity
-else
-    /bin/open5gs-${COMPONENT}d \
-        -c /etc/open5gs/${COMPONENT}.yaml \
-        -l /var/log/open5gs/${COMPONENT}.log \
-        -e debug \
-        -d
-fi
+DELAY=5
+CONFIG=/etc/open5gs/$COMPONENT.yaml
+LOG=/var/log/open5gs/$COMPONENT.log
+
+while true; do
+
+    CONFIGURED=false
+
+    case "$COMPONENT" in
+        # These components require MongoDB
+        udr|pcf|pcrf|hss|webui)
+            MONGODB_URI=$(kubectl get mongodbcommunity open5gs-mongodb --output=jsonpath={.status.mongoUri})
+            if [ -n "$MONGODB_URI" ]; then
+                MONGODB_URI="mongodb://user:password@${MONGODB_URI:10}/open5gs?replicaSet=open5gs-mongodb&authSource=admin"
+                echo "! MongoDB URI = $MONGODB_URI"
+
+                if [ "$COMPONENT" == webui ]; then
+                    export DB_URI=$MONGODB_URI
+                else
+                    cat "$CONFIG.template" | MONGODB_URI=$MONGODB_URI envsubst > "$CONFIG"
+                fi
+                CONFIGURED=true
+                #kubectl get configmaps "$COMPONENT" --output=jsonpath='{.data.upf\.yaml}'
+            else
+                echo '! MongoDB is not up'
+            fi
+            ;;
+
+        *)
+            cp "$CONFIG.template" "$CONFIG"
+            CONFIGURED=true
+            ;;
+    esac
+
+    if [ "$CONFIGURED" == true ]; then
+        echo "! Starting $COMPONENT..."
+        if [ "$COMPONENT" == webui ]; then
+            cd /opt/open5gs-webui
+            npm run dev
+        else
+            "/bin/open5gs-${COMPONENT}d" \
+                -c "$CONFIG" \
+                -l "$LOG" \
+                -e debug \
+                -d
+        fi
+        echo "! $COMPONENT failed to start"
+    else
+        echo "! $COMPONENT not yet configured"
+    fi
+
+    echo '! Retrying in $DELAY seconds...'
+    sleep "$DELAY"
+
+done

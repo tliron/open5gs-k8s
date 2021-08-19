@@ -21,7 +21,7 @@ You will need access to a Kubernetes cluster. For testing you can use
         --addons=registry \
         --feature-gates=SCTPSupport=true
 
-We will be using [Reposure](https://github.com/tliron/reposure) to run a container image registry in the
+We will be using [Reposure](https://github.com/tliron/reposure) to access a container image registry in the
 cluster. To install it and set it up for Minikube's registry add-on:
 
     reposure operator install --role=view --wait -v
@@ -39,16 +39,16 @@ machine for you. To use it, change into this repository's directory and run:
 
 1. install-build-dependencies
 2. build-distribution
-3. build-container-image
-4. publish-container-image
+3. generate-configs
+4. build-container-image
+5. publish-container-image
 
 ### Step 3: Deploy
 
 1. deploy-mongodb (uses the [MongoDB community operator](https://github.com/mongodb/mongodb-kubernetes-operator))
-2. generate-configs
+2. deploy-certificates (uses [cert-manager](https://github.com/jetstack/cert-manager))
 3. deploy-configs
-4. deploy-certificates (uses [cert-manager](https://github.com/jetstack/cert-manager))
-5. deploy-open5gs
+4. deploy-open5gs
 
 ### Utilities
 

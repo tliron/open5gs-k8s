@@ -34,7 +34,7 @@ capability_types:
             spec:
               containers:
               - name: main
-                image: { concat: [ { get_input: registry }, /open5gs:latest ] }
+                image: { concat: [ { get_input: registry }, /, { get_input: image-tag } ] }
                 imagePullPolicy: Always
                 env:
                 - name: COMPONENT
@@ -52,6 +52,6 @@ capability_types:
                 securityContext:
                   capabilities:
                     add:
-                    - "NET_RAW" # enables "ping"
-                    - "NET_ADMIN" # enables access to "/dev/net/tun" (TODO doesn't work)
+                    - NET_RAW # enables "ping"
+                    - NET_ADMIN # enables access to "/dev/net/tun" (TODO doesn't work)
                   privileged: true # HACK to access "/dev/net/tun"

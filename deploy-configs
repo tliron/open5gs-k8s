@@ -17,10 +17,10 @@ function d () {
     local YAML=$HERE/work/etc/open5gs/$COMPONENT.yaml
     local CONF=$HERE/work/etc/freeDiameter/$COMPONENT.conf
 
-    if [ "$COMPONENT" == webui ]; then
-        kubectl create configmap "$COMPONENT" \
-            --from-file="$HERE/work/etc/open5gs/db_uri"
-    elif [ -f "$CONF" ]; then
+    #if [ "$COMPONENT" == webui ]; then
+    #    kubectl create configmap "$COMPONENT" \
+    #        --from-file="$HERE/work/etc/open5gs/db_uri"
+    if [ -f "$CONF" ]; then
         kubectl create configmap "$COMPONENT" \
             --from-file="$YAML" \
             --from-file="$CONF"
@@ -53,4 +53,4 @@ d smf
 d udm
 d udr
 d upf
-d webui
+#d webui

@@ -8,6 +8,9 @@ if [ "$1" == -c ] || [ "$1" == -b ]; then
     m 'cleaning up...'
     kubectl delete deployments --selector=app.kubernetes.io/part-of=open5gs --ignore-not-found=true
     kubectl delete services --selector=app.kubernetes.io/part-of=open5gs --ignore-not-found=true
+    kubectl delete rolebindings --selector=app.kubernetes.io/part-of=open5gs --ignore-not-found=true
+    kubectl delete roles --selector=app.kubernetes.io/part-of=open5gs --ignore-not-found=true
+    kubectl delete serviceaccounts --selector=app.kubernetes.io/part-of=open5gs --ignore-not-found=true
     kubectl wait pods --selector=app.kubernetes.io/part-of=open5gs --for=delete || true
     kubectl wait services --selector=app.kubernetes.io/part-of=open5gs --for=delete || true
 fi
@@ -17,6 +20,12 @@ if [ "$1" == -b ]; then
     "$HERE/build-container-image"
     "$HERE/publish-container-image"
 fi
+
+m 'deploying RBAC...'
+
+VERSION=$OPEN5GS_VERSION \
+envsubst < "$HERE/assets/kubernetes/rbac.yaml" |
+kubectl apply -f -
 
 m 'deploying services...'
 
@@ -36,6 +45,7 @@ function d () {
     VERSION=$OPEN5GS_VERSION \
     COMPONENT=$1 \
     REGISTRY=$(reposure registry info default host) \
+    IMAGE_TAG=$OPEN5GS_IMAGE_TAG \
     envsubst < "$TEMPLATE" |
     kubectl apply -f -
 }

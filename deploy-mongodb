@@ -9,7 +9,7 @@ BASE=$HERE/work/mongodb-kubernetes-operator
 if [ ! -d "$BASE" ]; then
     m 'cloning repository...'
     # git clone https://github.com/mongodb/mongodb-kubernetes-operator.git "$BASE" --branch "v$MONGODB_OPERATOR_VERSION" --depth 1
-    # The tag is v0.7.0 is broken, so we'll use master
+    # The tag v0.7.0 is broken, so we'll use master
     git clone https://github.com/mongodb/mongodb-kubernetes-operator.git "$BASE" --depth 1
 fi
 

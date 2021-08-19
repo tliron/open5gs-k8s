@@ -1,0 +1,8 @@
+#!/bin/bash
+set -e
+
+HERE=$(dirname "$(readlink --canonicalize "$BASH_SOURCE")")
+
+COMPONENT=$1
+
+kubectl get configmaps "$COMPONENT" --output=jsonpath="{.data.$COMPONENT\.yaml}"

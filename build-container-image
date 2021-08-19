@@ -14,10 +14,10 @@ DIST=$HERE/work/dist
 
 buildah copy "$CONTAINER_ID" "$HERE/assets/scripts/entrypoint" /bin/open5gs
 buildah copy "$CONTAINER_ID" "$DIST/bin/"* /bin/
-# Components that need freeDiameter: smf, pcrf, hss, mme
 buildah_copy_recursive "$CONTAINER_ID" "$DIST/lib64" /lib64
 # For webui
 buildah_copy_recursive "$CONTAINER_ID" "$DIST/opt/open5gs-webui" /opt/open5gs-webui
+
 r mkdir --parents /var/log/open5gs
 
 cat <<- EOT > "$HERE/work/mongodb.repo"
@@ -31,11 +31,14 @@ EOT
 
 buildah copy "$CONTAINER_ID" "$HERE/work/mongodb.repo" /etc/yum.repos.d/
 
+buildah copy "$CONTAINER_ID" "$(which kubectl)" /usr/bin/
+
+# "gettext" for "envsubst"
 # "iputils" for "ping"
 # "mongodb-org-shell" for "mongo"
 
 r dnf install --assumeyes \
-	iputils \
+	gettext iputils \
 	mongodb-org-shell \
 	mongo-c-driver \
 	libidn \
@@ -49,4 +52,4 @@ buildah config \
 	--entrypoint /bin/open5gs \
 	"$CONTAINER_ID"
 
-buildah commit "$CONTAINER_ID" localhost/open5gs
+buildah commit "$CONTAINER_ID" "localhost/$OPEN5GS_IMAGE_TAG"

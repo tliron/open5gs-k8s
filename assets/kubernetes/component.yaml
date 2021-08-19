@@ -29,15 +29,16 @@ spec:
         app.kubernetes.io/part-of: open5gs
         app.kubernetes.io/managed-by: open5gs
     spec:
+      serviceAccountName: open5gs
       containers:
       - name: main
-        image: $REGISTRY/open5gs:latest
+        image: $REGISTRY/$IMAGE_TAG
         imagePullPolicy: Always
         env:
         - name: COMPONENT
           value: $COMPONENT
         volumeMounts:
-        - mountPath: /etc/open5gs/$COMPONENT.yaml
+        - mountPath: /etc/open5gs/$COMPONENT.yaml.template
           name: config
           subPath: $COMPONENT.yaml
         - mountPath: /etc/freeDiameter/$COMPONENT.conf
@@ -49,8 +50,8 @@ spec:
         securityContext:
           capabilities:
             add:
-            - "NET_RAW" # enables "ping"
-            - "NET_ADMIN" # enables access to "/dev/net/tun" (TODO doesn't work)
+            - NET_RAW # enables "ping"
+            - NET_ADMIN # enables access to "/dev/net/tun" (TODO doesn't work)
           privileged: true # HACK to access "/dev/net/tun"
       volumes:
       - name: config

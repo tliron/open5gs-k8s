@@ -29,15 +29,16 @@ spec:
         app.kubernetes.io/part-of: open5gs
         app.kubernetes.io/managed-by: open5gs
     spec:
+      serviceAccountName: open5gs
       containers:
       - name: main
-        image: $REGISTRY/open5gs:latest
+        image: $REGISTRY/$IMAGE_TAG
         imagePullPolicy: Always
         env:
         - name: COMPONENT
           value: $COMPONENT
-        - name: DB_URI
-          valueFrom:
-            configMapKeyRef:
-              name: $COMPONENT
-              key: db_uri
+        #- name: DB_URI
+        #  valueFrom:
+        #    configMapKeyRef:
+        #      name: $COMPONENT
+        #      key: db_uri

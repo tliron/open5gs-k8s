@@ -20,10 +20,13 @@ topology_template:
       default: mme
     version:
       type: string
-      default: 2.3.0
+      default: 2.3.2
     registry:
       type: string
       default: docker.io
+    image-tag:
+      type: string
+      default: openg5s/open5gs:latest
     namespace:
       type: string
       default: workspace

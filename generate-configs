@@ -8,11 +8,11 @@ ETC=$HERE/work/etc
 
 rsync -v --recursive --exclude='*.pem' $HERE/work/dist/etc/* "$ETC/"
 
-MONGODB_URI=$(kubectl get mongodbcommunity open5gs-mongodb --output=jsonpath={.status.mongoUri})
-MONGODB_URI="mongodb://user:password@${MONGODB_URI:10}/open5gs?replicaSet=open5gs-mongodb&authSource=admin"
+#MONGODB_URI=$(kubectl get mongodbcommunity open5gs-mongodb --output=jsonpath={.status.mongoUri})
+#MONGODB_URI="mongodb://user:password@${MONGODB_URI:10}/open5gs?replicaSet=open5gs-mongodb&authSource=admin"
 
 # webui just needs the MongoDB URI
-echo -n "$MONGODB_URI" > "$ETC/open5gs/db_uri"
+#echo -n "$MONGODB_URI" > "$ETC/open5gs/db_uri"
 
 # Fix relative directories
 sed --in-place \
@@ -23,14 +23,17 @@ sed --in-place \
     "$ETC/freeDiameter/"*.conf
 
 # MongoDB URI (for udr, pcf, pcrf, hss)
+#sed --in-place \
+#    "s|^db_uri: .*|db_uri: '$(escape_sed "$MONGODB_URI")'|" \
+#    "$ETC/open5gs/"*.yaml
 sed --in-place \
-    "s|^db_uri: .*|db_uri: '$(escape_sed "$MONGODB_URI")'|" \
+    "s|^db_uri: .*|db_uri: '\$MONGODB_URI'|" \
     "$ETC/open5gs/"*.yaml
 
 # Disable IPv6
-#sed --in-place \
-#    '/^#/!s|- ::1|#- ::1|' \
-#    "$ETC/open5gs/"*.yaml
+sed --in-place \
+    '/^#/!s|- ::1|#- ::1|' \
+    "$ETC/open5gs/"*.yaml
 
 # Listen on all addresses
 sed --in-place \
